@@ -43,13 +43,28 @@ ci-cd-data-pipeline/
 
 ```
 docker build -t data-pipeline .
-docker run -p 8000:8000 data-pipeline
+docker run --rm -p 8000:8000 data-pipeline
 ```
 
 Access the service:
 
 ```
 http://localhost:8000
+```
+
+Health check:
+
+```
+http://localhost:8000/health
+```
+
+### Run a Published Image
+
+Images are published to GitHub Container Registry for pushes to `main`:
+
+```
+docker pull ghcr.io/kennethsfulton/fastapi-ci-cd-pipeline:latest
+docker run --rm -p 8000:8000 ghcr.io/kennethsfulton/fastapi-ci-cd-pipeline:latest
 ```
 
 ### Run Tests Locally
