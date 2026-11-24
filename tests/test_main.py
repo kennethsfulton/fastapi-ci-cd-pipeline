@@ -66,3 +66,42 @@ def test_item_not_found():
     response = client.get("/items/999")
     assert response.status_code == 404
     assert response.json() == {"detail": "item not found"}
+
+
+def test_csv_ingestion_transforms_valid_rows():
+    response = client.post(
+        "/pipeline/ingest",
+        files={"file": ("sales.csv", b"name,amount\nalice,12.345\nbob,\n", "text/csv")},
+    )
+
+    assert response.status_code == 200
+    run = response.json()
+    assert run["filename"] == "sales.csv"
+    assert run["status"] == "completed"
+    assert run["rows_received"] == 2
+    assert run["rows_accepted"] == 1
+    assert run["rows_rejected"] == 1
+
+
+def test_csv_ingestion_requires_columns():
+    response = client.post(
+        "/pipeline/ingest",
+        files={"file": ("invalid.csv", b"product,price\none,10\n", "text/csv")},
+    )
+
+    assert response.status_code == 400
+    assert "name and amount" in response.json()["detail"]
+
+
+def test_ingestion_records_can_be_read_by_run():
+    response = client.post(
+        "/pipeline/ingest",
+        files={"file": ("sales.csv", b"name,amount\nalice,12.345\n", "text/csv")},
+    )
+    run_id = response.json()["id"]
+
+    records_response = client.get(f"/pipeline/runs/{run_id}/records")
+    assert records_response.status_code == 200
+    assert records_response.json() == [
+        {"id": 1, "run_id": run_id, "name": "Alice", "amount": 12.35}
+    ]

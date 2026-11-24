@@ -75,6 +75,21 @@ curl -X POST http://localhost:8000/items \
 curl http://localhost:8000/items
 ```
 
+### Ingest a CSV Data Batch
+
+Upload a UTF-8 CSV containing `name` and `amount` columns:
+
+```
+curl -X POST http://localhost:8000/pipeline/ingest \
+  -F "file=@sales.csv"
+
+curl http://localhost:8000/pipeline/runs
+curl http://localhost:8000/pipeline/runs/1/records
+```
+
+Valid rows have names normalized to title case and amounts rounded to two decimal places.
+Invalid rows are counted and skipped without failing the batch.
+
 ### Run a Published Image
 
 Images are published to GitHub Container Registry for pushes to `main`:
