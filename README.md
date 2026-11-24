@@ -58,6 +58,23 @@ Health check:
 http://localhost:8000/health
 ```
 
+### Run with PostgreSQL
+
+Start the API and PostgreSQL together:
+
+```
+docker compose up --build
+```
+
+The API creates the `items` table automatically. Create and read an item:
+
+```
+curl -X POST http://localhost:8000/items \
+  -H "Content-Type: application/json" \
+  -d '{"name":"example"}'
+curl http://localhost:8000/items
+```
+
 ### Run a Published Image
 
 Images are published to GitHub Container Registry for pushes to `main`:
